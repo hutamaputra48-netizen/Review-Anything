@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Review Anything</title>
+        <style>
+            :root {
+                font-family: "Noto Sans JP", "Hiragino Kaku Gothic Pro", Meiryo, sans-serif;
+                color: #2c2120;
+                background: #f8f0ec;
+            }
+            body {
+                margin: 0;
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 24px;
+                background: radial-gradient(circle at top, #fff5f2, #f1d9d1 45%, #e8c4b8 100%);
+            }
+            .container {
+                width: min(100%, 960px);
+                background: #fff8f6;
+                border-radius: 18px;
+                box-shadow: 0 24px 52px rgba(111, 59, 49, 0.12);
+                overflow: hidden;
+            }
+            header {
+                padding: 34px 34px 22px;
+                background: linear-gradient(135deg, #c83229 0%, #f0c1b5 100%);
+                color: #fff;
+                background-image:
+                    linear-gradient(135deg, #c83229 0%, #f0c1b5 100%),
+                    radial-gradient(circle at 15% 15%, rgba(255,255,255,0.28), transparent 18%),
+                    repeating-linear-gradient(45deg, rgba(255,255,255,0.12), rgba(255,255,255,0.12) 1px, transparent 1px, transparent 16px);
+            }
+            header h1 {
+                margin: 0 0 12px;
+                font-size: clamp(2rem, 4vw, 3rem);
+                line-height: 1.05;
+                letter-spacing: 0.02em;
+                text-shadow: 0 1px 9px rgba(0, 0, 0, 0.18);
+            }
+            header p {
+                margin: 0 0 16px;
+                opacity: 0.92;
+                max-width: 680px;
+            }
+            .header-actions {
+                display: flex;
+                gap: 14px;
+                flex-wrap: wrap;
+            }
+            .btn-link {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                text-decoration: none;
+                background: #fff;
+                color: #c83229;
+                padding: 12px 20px;
+                border-radius: 999px;
+                font-weight: 700;
+                box-shadow: 0 10px 24px rgba(168, 48, 39, 0.18);
+                transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+            }
+            .btn-link:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 12px 28px rgba(168, 48, 39, 0.24);
+                background: #fff5f4;
+            }
+            main {
+                padding: 32px;
+            }
+            .card {
+                background: #fff7f2;
+                border: 1px solid #f4d5cf;
+                border-radius: 16px;
+                padding: 26px;
+                margin-bottom: 24px;
+            }
+            .review-panel {
+                display: grid;
+                grid-template-columns: 1.2fr 0.8fr;
+                gap: 24px;
+                align-items: start;
+            }
+            .photo-card {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background: #fff0ef;
+                border-radius: 16px;
+                padding: 24px;
+                min-height: 220px;
+                text-align: center;
+                box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.55);
+            }
+            .photo-card .emoji {
+                font-size: 64px;
+                margin-bottom: 12px;
+            }
+            label {
+                display: block;
+                margin-bottom: 8px;
+                font-weight: 600;
+            }
+            input,
+            textarea,
+            select {
+                width: 100%;
+                border: 1px solid #e5c3bd;
+                border-radius: 14px;
+                padding: 14px 16px;
+                font-size: 1rem;
+                background: #fff;
+                box-sizing: border-box;
+                transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            }
+            input:focus,
+            textarea:focus,
+            select:focus {
+                outline: none;
+                border-color: #c83229;
+                box-shadow: 0 0 0 4px rgba(200, 50, 41, 0.16);
+            }
+            textarea {
+                min-height: 160px;
+                resize: vertical;
+                margin-bottom: 16px;
+            }
+            .row {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 16px;
+                margin-bottom: 16px;
+            }
+            .row > * {
+                min-width: 0;
+            }
+            button {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                background: #c83229;
+                border: none;
+                color: #fff;
+                border-radius: 999px;
+                padding: 14px 22px;
+                font-size: 1rem;
+                font-weight: 700;
+                cursor: pointer;
+                transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+            }
+            button:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 12px 28px rgba(200, 50, 41, 0.22);
+                background: #d14737;
+            }
+            .review-list {
+                display: grid;
+                gap: 18px;
+            }
+            .review-item {
+                padding: 22px;
+                border-radius: 16px;
+                border: 1px solid #f1d2cb;
+                background: #fff;
+            }
+            .review-item h3 {
+                margin: 0 0 8px;
+                font-size: 1.1rem;
+            }
+            .review-item small {
+                color: #6d7a8a;
+            }
+            .review-item p {
+                margin: 12px 0 0;
+                line-height: 1.7;
+            }
+            .review-actions {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 12px;
+                margin-top: 16px;
+            }
+            .review-actions button {
+                background: #fff;
+                border: 1px solid #e5c3bd;
+                color: #c83229;
+                padding: 10px 16px;
+                border-radius: 999px;
+            }
+            .review-actions button.active {
+                background: #c83229;
+                color: #fff;
+                border-color: #c83229;
+            }
+            .review-actions button:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 8px 18px rgba(168, 48, 39, 0.16);
+            }
+            .reply-list {
+                margin-top: 18px;
+                padding-left: 16px;
+                border-left: 3px solid rgba(200, 50, 41, 0.15);
+                display: grid;
+                gap: 14px;
+            }
+            .reply-item {
+                padding: 16px;
+                border-radius: 14px;
+                background: #fff8f7;
+                border: 1px solid #f4d5cf;
+            }
+            .reply-item small {
+                display: block;
+                margin-top: 10px;
+                color: #6d7a8a;
+            }
+            .reply-form {
+                margin-top: 18px;
+                padding: 16px;
+                border-radius: 16px;
+                background: #fff5f4;
+                border: 1px solid #f4d5cf;
+            }
+            .reply-form textarea {
+                min-height: 100px;
+                margin-bottom: 12px;
+            }
+            .empty-state {
+                text-align: center;
+                color: #7b6b6a;
+                padding: 36px 0;
+            }
+            header marquee {
+                display: block;
+                margin-bottom: 20px;
+                overflow: hidden;
+                padding: 12px 0;
+                background: rgba(255, 255, 255, 0.18);
+                border-radius: 24px;
+                border: 1px solid rgba(255, 255, 255, 0.35);
+                box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+            }
+            header marquee img {
+                width: 112px;
+                height: 112px;
+                object-fit: cover;
+                margin-right: 18px;
+                border-radius: 20px;
+                border: 2px solid rgba(255, 255, 255, 0.65);
+                filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.18));
+                transition: transform 0.25s ease, filter 0.25s ease;
+                animation: float 4s ease-in-out infinite alternate;
+            }
+            header marquee img:hover {
+                transform: scale(1.08) rotate(-1deg);
+                filter: drop-shadow(0 18px 32px rgba(0, 0, 0, 0.28));
+            }
+            @keyframes float {
+                from { transform: translateY(0); }
+                to { transform: translateY(-8px); }
+            }
+            @media (max-width: 720px) {
+                .row {
+                    grid-template-columns: 1fr;
+                }
+                .review-panel {
+                    grid-template-columns: 1fr;
+                }
+                header,
+                main {
+                    padding: 24px;
+                }
+            }
+        </style>
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+        <div class="container">
+            <header>
+                <marquee behavior="scroll" direction="left" scrollamount="8">
+                    <img src="pesan itu dihapus_.jpg" alt="pesan itu dihapus" />
+                    <img src="988188343254468805.webp" alt="988188343254468805" />
+                    <img src="woilah woy!.jpg" alt="woilah woy!" />
+                    <img src="1018446903251535611.jpg" alt="1018446903251535611" />
+                </marquee>
+
+                <h1>Review Anything</h1>
+                <p>Write feedback for products, services, books, movies, or anything else. Your review will appear below so you can preview it instantly.</p>
+
+                <div id="sessionTimer" class="session-timer" aria-live="polite">
+                    You’ve been on this website for 00:00:00
+                </div>
+
+                <div class="header-actions">
+                    <a href="Recommendations.html" class="btn-link">Open Recommendations</a>
+                    <a href="Community.html" class="btn-link">Community</a>
+                    <a href="1Star.html" class="btn-link">1 Star Reviews</a>
+                </div>
+            </header>
+
+            <main>
+                <section class="card guide-card">
+                    <h2>Newcomer Guide</h2>
+                    <div class="guide-list">
+                        <div class="guide-step">
+                            <div class="guide-badge">1</div>
+                            <div>
+                                <strong>Write your review</strong>
+                                <p>Enter a subject, choose a rating, and tell others what you think.</p>
+                            </div>
+                        </div>
+
+                        <div class="guide-step">
+                            <div class="guide-badge">2</div>
+                            <div>
+                                <strong>Post it</strong>
+                                <p>Click “Post Review” and your review will appear instantly in the list below.</p>
+                            </div>
+                        </div>
+
+                        <div class="guide-step">
+                            <div class="guide-badge">3</div>
+                            <div>
+                                <strong>Reply to others</strong>
+                                <p>Use the reply button on any review to share your opinion or respond to someone.</p>
+                            </div>
+                        </div>
+
+                        <div class="guide-step">
+                            <div class="guide-badge">4</div>
+                            <div>
+                                <strong>Check recommendations</strong>
+                                <p>Reviews with 5 stars are automatically added to the Recommendations page.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card review-panel">
+                    <div>
+                        <label for="subject">Subject</label>
+                        <input id="subject" placeholder="What did you review?" />
+
+                        <div class="row">
+                            <div>
+                                <label for="rating">Rating</label>
+                                <select id="rating">
+                                    <option value="1">1 star</option>
+                                    <option value="2">2 stars</option>
+                                    <option value="3">3 stars</option>
+                                    <option value="4">4 stars</option>
+                                    <option value="5" selected>5 stars</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label for="name">Your Name</label>
+                                <input id="name" placeholder="Enter your name" />
+                            </div>
+                        </div>
+
+                        <label for="review">Review</label>
+                        <textarea id="review" placeholder="Write your review..."></textarea>
+
+                        <button id="submitReview" type="button">Post Review</button>
+                    </div>
+
+                    <div class="photo-card">
+                        <div>
+                            <div class="emoji">⭐</div>
+                            <h3>5-star reviews are highlighted</h3>
+                            <p>Any review with 5 stars will automatically appear on the Recommendations page.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h2>Recent Reviews</h2>
+                    <div id="reviews" class="review-list"></div>
+                </section>
+            </main>
+        </div>
+
+        <section class="guide-card">
+            <h3>How to Write a Review</h3>
+            <div class="guide-list">
+                <div class="guide-step">
+                    <div class="guide-badge">1</div>
+                    <p>Choose a subject and rating.</p>
+                </div>
+                <div class="guide-step">
+                    <div class="guide-badge">2</div>
+                    <p>Enter your name and review text.</p>
+                </div>
+                <div class="guide-step">
+                    <div class="guide-badge">3</div>
+                    <p>Click "Post Review" to submit.</p>
+                </div>
+            </div>
+        </section>
+
+        <script>
+            const STORAGE_KEY = 'review-anything-reviews';
+            const RECOMMENDATIONS_KEY = 'review-anything-recommendations';
+            const SESSION_START_KEY = 'review-anything-session-start';
+
+            const subjectInput = document.getElementById('subject');
+            const ratingInput = document.getElementById('rating');
+            const nameInput = document.getElementById('name');
+            const reviewInput = document.getElementById('review');
+            const submitButton = document.getElementById('submitReview');
+            const reviewsContainer = document.getElementById('reviews');
+            const sessionTimer = document.getElementById('sessionTimer');
+
+            const savedStartTime = sessionStorage.getItem(SESSION_START_KEY);
+            let sessionStartTime = savedStartTime ? Number(savedStartTime) : Date.now();
+
+            if (!savedStartTime) {
+                sessionStorage.setItem(SESSION_START_KEY, String(sessionStartTime));
+            }
+
+            function formatDuration(totalSeconds) {
+                const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+                const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+                const seconds = String(totalSeconds % 60).padStart(2, '0');
+                return `${hours}:${minutes}:${seconds}`;
+            }
+
+            function updateSessionTimer() {
+                if (!sessionTimer) return;
+
+                const elapsedSeconds = Math.floor((Date.now() - sessionStartTime) / 1000);
+                sessionTimer.textContent = `You’ve been on this website for ${formatDuration(elapsedSeconds)}`;
+            }
+
+            updateSessionTimer();
+            setInterval(updateSessionTimer, 1000);
+
+            function getReviews() {
+                try {
+                    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+                } catch {
+                    return [];
+                }
+            }
+
+            function saveReviews(reviews) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(reviews));
+            }
+
+            function getRecommendations() {
+                try {
+                    return JSON.parse(localStorage.getItem(RECOMMENDATIONS_KEY) || '[]');
+                } catch {
+                    return [];
+                }
+            }
+
+            function saveRecommendations(recommendations) {
+                localStorage.setItem(RECOMMENDATIONS_KEY, JSON.stringify(recommendations));
+            }
+
+            function createReplyItem(reply) {
+                const replyItem = document.createElement('div');
+                replyItem.className = 'reply-item';
+
+                const header = document.createElement('div');
+                header.innerHTML = `<strong>${reply.name || 'Anonymous'}</strong> <small>${new Date(reply.createdAt).toLocaleString()}</small>`;
+                replyItem.appendChild(header);
+
+                const body = document.createElement('p');
+                body.textContent = reply.text;
+                replyItem.appendChild(body);
+
+                return replyItem;
+            }
+
+            function createReviewCard(review) {
+                const item = document.createElement('div');
+                item.className = 'review-item';
+
+                const title = document.createElement('h3');
+                title.textContent = review.subject || 'Untitled review';
+                item.appendChild(title);
+
+                const meta = document.createElement('small');
+                meta.textContent = `${review.name ? `• by ${review.name}` : ''}`;
+                item.appendChild(meta);
+
+                const lastComment = document.createElement('small');
+                lastComment.textContent = `Last comment: ${formatRelativeTime(getLastCommentTime(review))}`;
+                lastComment.style.display = 'block';
+                lastComment.style.marginTop = '8px';
+                item.appendChild(lastComment);
+
+                const ratingDisplay = document.createElement('div');
+                ratingDisplay.className = 'review-rating';
+                const stars = Number(review.rating) || 0;
+                ratingDisplay.innerHTML = Array.from({ length: 5 }, (_, index) =>
+                    `<span class="star">${index < stars ? '★' : '☆'}</span>`
+                ).join('');
+                item.appendChild(ratingDisplay);
+
+                const body = document.createElement('p');
+                body.textContent = review.text || 'No details provided yet.';
+                item.appendChild(body);
+
+                const actions = document.createElement('div');
+                actions.className = 'review-actions';
+
+                const likeButton = document.createElement('button');
+                likeButton.textContent = `Like (${review.likes || 0})`;
+                if (review.userVote === 'likes') likeButton.classList.add('active');
+                likeButton.addEventListener('click', () => updateReaction(review.id, 'likes'));
+                actions.appendChild(likeButton);
+
+                const dislikeButton = document.createElement('button');
+                dislikeButton.textContent = `Dislike (${review.dislikes || 0})`;
+                if (review.userVote === 'dislikes') dislikeButton.classList.add('active');
+                dislikeButton.addEventListener('click', () => updateReaction(review.id, 'dislikes'));
+                actions.appendChild(dislikeButton);
+
+                const replyButton = document.createElement('button');
+                replyButton.textContent = 'Reply';
+                replyButton.addEventListener('click', () => toggleReplyForm(item, review.id));
+                actions.appendChild(replyButton);
+
+                item.appendChild(actions);
+
+                if (review.replies && review.replies.length) {
+                    const replyList = document.createElement('div');
+                    replyList.className = 'reply-list';
+                    review.replies.forEach((reply) => replyList.appendChild(createReplyItem(reply)));
+                    item.appendChild(replyList);
+                }
+
+                return item;
+            }
+
+            function renderReviews() {
+                const reviews = getReviews();
+                reviewsContainer.innerHTML = '';
+
+                if (!reviews.length) {
+                    reviewsContainer.innerHTML = '<div class="empty-state">No reviews yet. Add one above to see it here.</div>';
+                    return;
+                }
+
+                const list = document.createElement('div');
+                list.className = 'review-list';
+
+                reviews.forEach((review) => {
+                    list.appendChild(createReviewCard(review));
+                });
+
+                reviewsContainer.appendChild(list);
+            }
+
+            function updateReaction(reviewId, field) {
+                const reviews = getReviews();
+                const updatedReviews = reviews.map((review) => {
+                    if (review.id !== reviewId) {
+                        review.replies = review.replies || [];
+                        return review;
+                    }
+
+                    review.likes = review.likes || 0;
+                    review.dislikes = review.dislikes || 0;
+                    const opposite = field === 'likes' ? 'dislikes' : 'likes';
+
+                    if (review.userVote === field) {
+                        review[field] = Math.max(0, review[field] - 1);
+                        review.userVote = null;
+                    } else {
+                        if (review.userVote === opposite) {
+                            review[opposite] = Math.max(0, review[opposite] - 1);
+                        }
+                        review[field] = (review[field] || 0) + 1;
+                        review.userVote = field;
+                    }
+
+                    review.replies = review.replies || [];
+                    return review;
+                });
+
+                saveReviews(updatedReviews);
+                renderReviews();
+            }
+
+            function toggleReplyForm(reviewElement, reviewId) {
+                const existingForm = reviewElement.querySelector('.reply-form');
+                if (existingForm) {
+                    existingForm.remove();
+                    return;
+                }
+
+                const form = document.createElement('div');
+                form.className = 'reply-form';
+                form.innerHTML = `
+                    <label>Reply</label>
+                    <textarea placeholder="Write your reply..."></textarea>
+                    <button type="button">Send Reply</button>
+                `;
+                const textarea = form.querySelector('textarea');
+                const sendButton = form.querySelector('button');
+                sendButton.addEventListener('click', () => {
+                    const text = textarea.value.trim();
+                    if (!text) return alert('Add a reply first.');
+                    addReply(reviewId, text);
+                });
+
+                reviewElement.appendChild(form);
+                textarea.focus();
+            }
+
+            function addReply(reviewId, text) {
+                const reviews = getReviews();
+                const reply = {
+                    id: `${reviewId}-${Date.now()}`,
+                    name: 'Reply user',
+                    text,
+                    createdAt: new Date().toISOString()
+                };
+
+                const updatedReviews = reviews.map((review) => {
+                    if (review.id === reviewId) {
+                        review.replies = review.replies || [];
+                        review.replies.unshift(reply);
+                    }
+                    return review;
+                });
+
+                saveReviews(updatedReviews);
+                renderReviews();
+            }
+
+            function addReview() {
+                const subject = subjectInput.value.trim();
+                const rating = ratingInput.value;
+                const name = nameInput.value.trim();
+                const reviewText = reviewInput.value.trim();
+
+                if (!subject && !reviewText) {
+                    alert('Please enter a subject or review text.');
+                    return;
+                }
+
+                const review = {
+                    id: Date.now(),
+                    subject,
+                    rating,
+                    name,
+                    text: reviewText,
+                    likes: 0,
+                    dislikes: 0,
+                    userVote: null,
+                    replies: [],
+                    createdAt: new Date().toISOString()
+                };
+
+                const reviews = getReviews();
+                reviews.unshift(review);
+                saveReviews(reviews);
+                renderReviews();
+
+                if (rating === '5') {
+                    const recommendations = getRecommendations();
+                    recommendations.unshift(review);
+                    saveRecommendations(recommendations);
+                }
+
+                subjectInput.value = '';
+                ratingInput.value = '5';
+                nameInput.value = '';
+                reviewInput.value = '';
+            }
+
+            submitButton.addEventListener('click', addReview);
+            renderReviews();
+
+            function getLastCommentTime(review) {
+                const timestamps = [review.createdAt, ...(review.replies || []).map((reply) => reply.createdAt)].filter(Boolean);
+                if (!timestamps.length) return null;
+                return timestamps.reduce((latest, current) => (new Date(current) > new Date(latest) ? current : latest), timestamps[0]);
+            }
+
+            function formatRelativeTime(value) {
+                if (!value) return 'No comments yet';
+
+                const diffMs = Date.now() - new Date(value).getTime();
+                if (Number.isNaN(diffMs) || diffMs < 0) return 'just now';
+
+                const seconds = Math.floor(diffMs / 1000);
+                if (seconds < 60) return 'just now';
+
+                const minutes = Math.floor(seconds / 60);
+                if (minutes < 60) return `${minutes} minute${minutes === 1 ? '' : 's'} ago`;
+
+                const hours = Math.floor(minutes / 66);
+                if (hours < 24) return `${hours} hour${hours === 1 ? '' : 's'} ago`;
+
+                const days = Math.floor(hours / 24);
+                if (days < 7) return `${days} day${days === 1 ? '' : 's'} ago`;
+
+                return new Date(value).toLocaleDateString();
+            }
+        </script>
+    </body>
+</html>
+
